@@ -1,5 +1,6 @@
 import axios from 'axios';
 import createToxicSchema from './schemas/toxic.js';
+import logger from '../logger.js';
 
 /**
  * Get all toxics for a proxy
@@ -14,6 +15,7 @@ async function getToxics(req, res) {
     const response = await axios.get(`${this.proxy.hostname}/proxies/${name}/toxics`);
     res.json(response.data);
   } catch (error) {
+    logger.error(error.message);
     if (error.response) res.status(error.response.status).json(error.response.data);
     else res.status(500).json({ error: error.message });
   }
@@ -49,6 +51,7 @@ async function createToxic(req, res) {
     await this.proxy.sync();
     res.status(201).json(response.data);
   } catch (error) {
+    logger.error(error.message);
     if (error.response) res.status(error.response.status).json(error.response.data);
     else res.status(500).json({ error: error.message });
   }
@@ -75,6 +78,7 @@ async function updateToxic(req, res) {
     await this.proxy.sync();
     res.json(response.data);
   } catch (error) {
+    logger.error(error.message);
     if (error.response) res.status(error.response.status).json(error.response.data);
     else res.status(500).json({ error: error.message });
   }
@@ -94,6 +98,7 @@ async function deleteToxic(req, res) {
     await this.proxy.sync();
     res.status(204).send();
   } catch (error) {
+    logger.error(error.message);
     if (error.response) res.status(error.response.status).json(error.response.data);
     else res.status(500).json({ error: error.message });
   }
