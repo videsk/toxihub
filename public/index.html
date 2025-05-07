@@ -1,158 +1,278 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="bg-gray-900 text-green-400">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Toxiproxy API Client</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <title>Toxiproxy - Network Chaos Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'terminal-black': '#0d1117',
+                        'terminal-green': '#4af626',
+                        'terminal-dim': '#26a269',
+                        'terminal-red': '#e06c75',
+                        'terminal-yellow': '#d7ba7d',
+                        'terminal-blue': '#61afef',
+                        'terminal-purple': '#c678dd',
+                        'terminal-cyan': '#56b6c2',
+                    },
+                    fontFamily: {
+                        'mono': ['Consolas', 'Monaco', 'Courier New', 'monospace'],
+                    },
+                    animation: {
+                        'blink': 'blink 1s step-end infinite',
+                    },
+                    keyframes: {
+                        blink: {
+                            '0%, 100%': { opacity: 1 },
+                            '50%': { opacity: 0 },
+                        }
+                    }
+                }
+            }
+        };
+    </script>
     <style>
-        .container {
-            max-width: 1200px;
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
         }
-        .toxic-card {
-            margin-bottom: 15px;
+        .glitch-text:hover {
+            animation: glitch 200ms linear 3;
+            text-shadow: 1px 0 0 #e06c75, -1px 0 0 #56b6c2;
         }
-        pre {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
+        .scanline {
+            background: rgba(122, 239, 164, 0.1);
+            height: 2px;
+            position: absolute;
+            width: 100%;
+            z-index: 999;
+            animation: scanline 6s linear infinite;
         }
-        .status-badge {
+        @keyframes scanline {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+        .crt-effect {
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.02));
+            background-size: 100% 2px, 3px 100%;
+        }
+
+        /* Styling for proxy buttons */
+        .proxy-button {
+            display: inline-block;
+            padding: 2px 6px;
+            border: 1px solid;
+            margin: 2px 0;
+            transition: all 0.2s;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
             font-size: 0.8rem;
-            margin-left: 10px;
         }
-        .proxy-controls {
-            display: flex;
-            gap: 10px;
+        .enable-btn {
+            border-color: #4af626;
+            color: #4af626;
+            background-color: rgba(74, 246, 38, 0.1);
+        }
+        .enable-btn:hover {
+            background-color: #4af626;
+            color: #0d1117;
+        }
+        .disable-btn {
+            border-color: #e06c75;
+            color: #e06c75;
+            background-color: rgba(224, 108, 117, 0.1);
+        }
+        .disable-btn:hover {
+            background-color: #e06c75;
+            color: #0d1117;
+        }
+        .delete-btn {
+            border-color: #d7ba7d;
+            color: #d7ba7d;
+            background-color: rgba(215, 186, 125, 0.1);
+        }
+        .delete-btn:hover {
+            background-color: #d7ba7d;
+            color: #0d1117;
+        }
+
+        /* Attributes input styling fix */
+        .toxic-attr-input {
+            width: 100%;
+            background-color: #1f2937;
+            border: 1px solid #26a269;
+            color: #4af626;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .toxic-attr-input:focus {
+            outline: none;
+            border-color: #4af626;
         }
     </style>
 </head>
-<body>
-    <div class="container mt-5">
-        <div class="row mb-4">
-            <div class="col-12">
-                <h1>Toxiproxy API Client</h1>
-                <div class="d-flex align-items-center mb-3">
-                    <h5 class="mb-0 me-2">Server Status:</h5>
-                    <span id="server-status-badge" class="badge bg-secondary">Checking...</span>
-                </div>
-                <div class="btn-group mb-4">
-                    <button id="start-server-btn" class="btn btn-success">Start Server</button>
-                    <button id="stop-server-btn" class="btn btn-danger">Stop Server</button>
-                    <button id="refresh-btn" class="btn btn-info">Refresh</button>
-                    <button id="reset-btn" class="btn btn-warning">Reset All</button>
+<body class="font-mono bg-terminal-black crt-effect min-h-screen">
+    <div class="scanline"></div>
+    <div class="container mx-auto px-4 py-6">
+        <!-- Header -->
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-terminal-green inline-flex items-center glitch-text">
+                <i class="fas fa-bug mr-2"></i> TOXIPROXY_CONSOLE <span class="text-terminal-green animate-blink ml-1">_</span>
+            </h1>
+            <div class="flex items-center mt-3 border border-terminal-dim p-2 bg-gray-900 rounded">
+                <p class="text-terminal-dim mr-2">// status:</p>
+                <span id="server-status-badge" class="px-2 py-1 text-xs rounded bg-gray-800 text-gray-400">CHECKING...</span>
+                <div class="ml-auto flex space-x-2">
+                    <button id="start-server-btn" class="px-2 py-1 border border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-black transition-colors">
+                        <i class="fas fa-play mr-1"></i> START
+                    </button>
+                    <button id="stop-server-btn" class="px-2 py-1 border border-terminal-red text-terminal-red hover:bg-terminal-red hover:text-terminal-black transition-colors">
+                        <i class="fas fa-stop mr-1"></i> STOP
+                    </button>
+                    <button id="refresh-btn" class="px-2 py-1 border border-terminal-blue text-terminal-blue hover:bg-terminal-blue hover:text-terminal-black transition-colors">
+                        <i class="fas fa-sync-alt mr-1"></i> REFRESH
+                    </button>
+                    <button id="reset-btn" class="px-2 py-1 border border-terminal-yellow text-terminal-yellow hover:bg-terminal-yellow hover:text-terminal-black transition-colors">
+                        <i class="fas fa-skull-crossbones mr-1"></i> RESET
+                    </button>
                 </div>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-5">
-                <!-- Create Proxy Form -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5>Create New Proxy</h5>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Left column -->
+            <div class="lg:col-span-5 space-y-6">
+                <!-- Create Proxy Panel -->
+                <div class="border border-terminal-dim bg-gray-900/60 rounded">
+                    <div class="p-3 border-b border-terminal-dim bg-gray-800/40">
+                        <h2 class="text-terminal-green flex items-center">
+                            <i class="fas fa-plus-circle mr-2"></i> CREATE PROXY
+                        </h2>
                     </div>
-                    <div class="card-body">
-                        <form id="create-proxy-form">
-                            <div class="mb-3">
-                                <label for="proxy-name" class="form-label">Name</label>
-                                <input type="text" class="form-control" id="proxy-name" required>
+                    <div class="p-4">
+                        <form id="create-proxy-form" class="space-y-3">
+                            <div>
+                                <label for="proxy-name" class="text-terminal-dim block mb-1">PROXY_NAME</label>
+                                <input type="text" id="proxy-name" class="w-full bg-gray-800 border border-terminal-dim text-terminal-green px-3 py-2 focus:outline-none focus:border-terminal-green" required>
                             </div>
-                            <div class="mb-3">
-                                <label for="listen-address" class="form-label">Listen Address</label>
-                                <input type="text" class="form-control" id="listen-address" placeholder="127.0.0.1:8089" required>
+                            <div>
+                                <label for="listen-address" class="text-terminal-dim block mb-1">LISTEN_ADDRESS</label>
+                                <input type="text" id="listen-address" placeholder="127.0.0.1:8089" class="w-full bg-gray-800 border border-terminal-dim text-terminal-green px-3 py-2 focus:outline-none focus:border-terminal-green" required>
                             </div>
-                            <div class="mb-3">
-                                <label for="upstream-address" class="form-label">Upstream Address</label>
-                                <input type="text" class="form-control" id="upstream-address" placeholder="127.0.0.1:5432" required>
+                            <div>
+                                <label for="upstream-address" class="text-terminal-dim block mb-1">UPSTREAM_ADDRESS</label>
+                                <input type="text" id="upstream-address" placeholder="127.0.0.1:5432" class="w-full bg-gray-800 border border-terminal-dim text-terminal-green px-3 py-2 focus:outline-none focus:border-terminal-green" required>
                             </div>
-                            <button type="submit" class="btn btn-primary">Create Proxy</button>
+                            <div>
+                                <button type="submit" class="w-full py-2 mt-2 bg-terminal-black border border-terminal-green text-terminal-green hover:bg-terminal-green hover:text-terminal-black transition-colors">
+                                    <i class="fas fa-terminal mr-1"></i> EXECUTE
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
 
-                <!-- Add Toxic Form -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5>Add Toxic</h5>
+                <!-- Add Toxic Panel -->
+                <div class="border border-terminal-dim bg-gray-900/60 rounded">
+                    <div class="p-3 border-b border-terminal-dim bg-gray-800/40">
+                        <h2 class="text-terminal-red flex items-center">
+                            <i class="fas fa-biohazard mr-2"></i> INJECT TOXIC
+                        </h2>
                     </div>
-                    <div class="card-body">
-                        <form id="add-toxic-form">
-                            <div class="mb-3">
-                                <label for="toxic-proxy" class="form-label">Proxy</label>
-                                <select class="form-select" id="toxic-proxy" required>
-                                    <option value="">Select a proxy</option>
+                    <div class="p-4">
+                        <form id="add-toxic-form" class="space-y-3">
+                            <div>
+                                <label for="toxic-proxy" class="text-terminal-dim block mb-1">TARGET_PROXY</label>
+                                <select id="toxic-proxy" class="w-full bg-gray-800 border border-terminal-dim text-terminal-green px-3 py-2 focus:outline-none focus:border-terminal-green" required>
+                                    <option value="" class="bg-gray-900 text-gray-500">SELECT_PROXY</option>
                                 </select>
                             </div>
-                            <div class="mb-3">
-                                <label for="toxic-type" class="form-label">Toxic Type</label>
-                                <select class="form-select" id="toxic-type" required>
-                                    <option value="">Select a toxic type</option>
-                                    <option value="latency">Latency</option>
-                                    <option value="bandwidth">Bandwidth</option>
-                                    <option value="slow_close">Slow Close</option>
-                                    <option value="timeout">Timeout</option>
-                                    <option value="reset_peer">Reset Peer</option>
-                                    <option value="slicer">Slicer</option>
-                                    <option value="limit_data">Limit Data</option>
+                            <div>
+                                <label for="toxic-type" class="text-terminal-dim block mb-1">TOXIC_TYPE</label>
+                                <select id="toxic-type" class="w-full bg-gray-800 border border-terminal-dim text-terminal-green px-3 py-2 focus:outline-none focus:border-terminal-green" required>
+                                    <option value="" class="bg-gray-900 text-gray-500">SELECT_TOXIC</option>
+                                    <option value="latency" class="bg-gray-900">LATENCY</option>
+                                    <option value="bandwidth" class="bg-gray-900">BANDWIDTH</option>
+                                    <option value="slow_close" class="bg-gray-900">SLOW_CLOSE</option>
+                                    <option value="timeout" class="bg-gray-900">TIMEOUT</option>
+                                    <option value="reset_peer" class="bg-gray-900">RESET_PEER</option>
+                                    <option value="slicer" class="bg-gray-900">SLICER</option>
+                                    <option value="limit_data" class="bg-gray-900">LIMIT_DATA</option>
                                 </select>
                             </div>
-                            <div class="mb-3">
-                                <label for="toxic-stream" class="form-label">Stream</label>
-                                <select class="form-select" id="toxic-stream">
-                                    <option value="downstream">Downstream</option>
-                                    <option value="upstream">Upstream</option>
+                            <div>
+                                <label for="toxic-stream" class="text-terminal-dim block mb-1">DATA_STREAM</label>
+                                <select id="toxic-stream" class="w-full bg-gray-800 border border-terminal-dim text-terminal-green px-3 py-2 focus:outline-none focus:border-terminal-green">
+                                    <option value="downstream" class="bg-gray-900">DOWNSTREAM</option>
+                                    <option value="upstream" class="bg-gray-900">UPSTREAM</option>
                                 </select>
                             </div>
-                            <div class="mb-3">
-                                <label for="toxic-toxicity" class="form-label">Toxicity (0-1)</label>
-                                <input type="number" class="form-control" id="toxic-toxicity" value="1" min="0" max="1" step="0.1">
+                            <div>
+                                <label for="toxic-toxicity" class="text-terminal-dim block mb-1">TOXICITY [0-1]</label>
+                                <input type="number" id="toxic-toxicity" value="1" min="0" max="1" step="0.1" class="w-full bg-gray-800 border border-terminal-dim text-terminal-green px-3 py-2 focus:outline-none focus:border-terminal-green">
                             </div>
 
                             <!-- Dynamic attributes based on toxic type -->
-                            <div id="toxic-attributes">
-                                <div class="alert alert-info">
-                                    Select a toxic type to see available attributes
-                                </div>
+                            <div id="toxic-attributes" class="border border-dashed border-terminal-dim p-3 bg-gray-800/30">
+                                <p class="text-terminal-yellow text-sm">
+                                    <i class="fas fa-info-circle mr-1"></i> SELECT A TOXIC TYPE TO CONFIGURE PARAMETERS
+                                </p>
                             </div>
 
-                            <button type="submit" class="btn btn-primary">Add Toxic</button>
+                            <div>
+                                <button type="submit" class="w-full py-2 mt-2 bg-terminal-black border border-terminal-red text-terminal-red hover:bg-terminal-red hover:text-terminal-black transition-colors">
+                                    <i class="fas fa-radiation mr-1"></i> INJECT
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-7">
-                <!-- Proxies List -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5>Proxies</h5>
+            <!-- Right column -->
+            <div class="lg:col-span-7 space-y-6">
+                <!-- Proxies list -->
+                <div class="border border-terminal-dim bg-gray-900/60 rounded">
+                    <div class="p-3 border-b border-terminal-dim bg-gray-800/40">
+                        <h2 class="text-terminal-cyan flex items-center">
+                            <i class="fas fa-network-wired mr-2"></i> ACTIVE_PROXIES
+                        </h2>
                     </div>
-                    <div class="card-body">
-                        <div id="proxies-list">
-                            <div class="text-center">
-                                <div class="spinner-border" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
+                    <div class="p-4 max-h-[50vh] overflow-auto">
+                        <div id="proxies-list" class="space-y-3">
+                            <div class="flex justify-center">
+                                <div class="w-6 h-6 border-2 border-terminal-green border-t-transparent rounded-full animate-spin"></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- API Response -->
-                <div class="card">
-                    <div class="card-header">
-                        <h5>API Response</h5>
+                <div class="border border-terminal-dim bg-gray-900/60 rounded">
+                    <div class="p-3 border-b border-terminal-dim bg-gray-800/40">
+                        <h2 class="text-terminal-blue flex items-center">
+                            <i class="fas fa-exchange-alt mr-2"></i> API_RESPONSE
+                        </h2>
                     </div>
-                    <div class="card-body">
-                        <pre id="api-response">No API calls made yet.</pre>
+                    <div class="p-4">
+                        <pre id="api-response" class="bg-gray-800 p-3 rounded text-sm text-terminal-blue max-h-[30vh] overflow-auto">// Waiting for API response...</pre>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="main.js"></script>
+    <script src="ui.js"></script>
 </body>
 </html>
