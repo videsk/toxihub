@@ -22,7 +22,7 @@
 }
 
 @keyframes scanline {
-    0% { top: 0%; }
+    0% { top: 0; }
     100% { top: 100%; }
 }
 
