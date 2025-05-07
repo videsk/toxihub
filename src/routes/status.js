@@ -81,7 +81,7 @@ export default [
   },
   {
     callback: reset,
-    route: '/reset',
-    method: 'post'
+    route: '/status',
+    method: 'put'
   }
 ];
