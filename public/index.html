@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toxiproxy API Client</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .container {
+            max-width: 1200px;
+        }
+        .toxic-card {
+            margin-bottom: 15px;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .status-badge {
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+        .proxy-controls {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1>Toxiproxy API Client</h1>
+                <div class="d-flex align-items-center mb-3">
+                    <h5 class="mb-0 me-2">Server Status:</h5>
+                    <span id="server-status-badge" class="badge bg-secondary">Checking...</span>
+                </div>
+                <div class="btn-group mb-4">
+                    <button id="start-server-btn" class="btn btn-success">Start Server</button>
+                    <button id="stop-server-btn" class="btn btn-danger">Stop Server</button>
+                    <button id="refresh-btn" class="btn btn-info">Refresh</button>
+                    <button id="reset-btn" class="btn btn-warning">Reset All</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-5">
+                <!-- Create Proxy Form -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Create New Proxy</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="create-proxy-form">
+                            <div class="mb-3">
+                                <label for="proxy-name" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="proxy-name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="listen-address" class="form-label">Listen Address</label>
+                                <input type="text" class="form-control" id="listen-address" placeholder="127.0.0.1:8089" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="upstream-address" class="form-label">Upstream Address</label>
+                                <input type="text" class="form-control" id="upstream-address" placeholder="127.0.0.1:5432" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Create Proxy</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Add Toxic Form -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Add Toxic</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="add-toxic-form">
+                            <div class="mb-3">
+                                <label for="toxic-proxy" class="form-label">Proxy</label>
+                                <select class="form-select" id="toxic-proxy" required>
+                                    <option value="">Select a proxy</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="toxic-type" class="form-label">Toxic Type</label>
+                                <select class="form-select" id="toxic-type" required>
+                                    <option value="">Select a toxic type</option>
+                                    <option value="latency">Latency</option>
+                                    <option value="bandwidth">Bandwidth</option>
+                                    <option value="slow_close">Slow Close</option>
+                                    <option value="timeout">Timeout</option>
+                                    <option value="reset_peer">Reset Peer</option>
+                                    <option value="slicer">Slicer</option>
+                                    <option value="limit_data">Limit Data</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="toxic-stream" class="form-label">Stream</label>
+                                <select class="form-select" id="toxic-stream">
+                                    <option value="downstream">Downstream</option>
+                                    <option value="upstream">Upstream</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="toxic-toxicity" class="form-label">Toxicity (0-1)</label>
+                                <input type="number" class="form-control" id="toxic-toxicity" value="1" min="0" max="1" step="0.1">
+                            </div>
+
+                            <!-- Dynamic attributes based on toxic type -->
+                            <div id="toxic-attributes">
+                                <div class="alert alert-info">
+                                    Select a toxic type to see available attributes
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Add Toxic</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-7">
+                <!-- Proxies List -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Proxies</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="proxies-list">
+                            <div class="text-center">
+                                <div class="spinner-border" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Response -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5>API Response</h5>
+                    </div>
+                    <div class="card-body">
+                        <pre id="api-response">No API calls made yet.</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>

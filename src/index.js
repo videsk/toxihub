@@ -49,9 +49,7 @@ async function main() {
     });
   });
 
-  app.use('/', (req, res) => {
-    res.status(404).end();
-  });
+  app.use(express.static('public'));
 
   const server = await app.listen(config.port);
 
