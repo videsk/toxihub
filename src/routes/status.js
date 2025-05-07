@@ -78,5 +78,10 @@ export default [
     callback: stop,
     route: '/status',
     method: 'delete'
+  },
+  {
+    callback: reset,
+    route: '/reset',
+    method: 'post'
   }
 ];
