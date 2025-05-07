@@ -89,6 +89,14 @@ export class ToxiProxy extends EventEmitter {
     return true;
   }
 
+  restart() {
+    logger.info('Toxiproxy server is resetting');
+    this.#isRunning = false;
+    this.#process?.kill();
+    this.#process = null;
+    return this.start();
+  }
+
   async sync() {
     if (!this.#isRunning) return false;
     try {
