@@ -1,0 +1,40 @@
+{
+  "name": "@videsk/toxihub",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "A hub of ToxiProxy network simulation conditions",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "nodemon --inspect src/index.js",
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/videsk/toxihub.git"
+  },
+  "keywords": [
+    "toxiproxy",
+    "network",
+    "simulation",
+    "chaos",
+    "hub",
+    "api"
+  ],
+  "author": "videsk",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/videsk/toxihub/issues"
+  },
+  "homepage": "https://github.com/videsk/toxihub#readme",
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "axios": "^1.9.0",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10",
+    "winston": "^3.17.0"
+  }
+}

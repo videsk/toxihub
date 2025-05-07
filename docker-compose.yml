@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  toxiproxy-wrapper:
+    build: .
+    container_name: toxiproxy-wrapper
+    ports:
+      - "3000:3000"  # Wrapper API
+      - "8474:8474"  # Toxiproxy API
+    environment:
+      - PORT=3000
+      - TOXIPROXY_HOST=0.0.0.0
+      - TOXIPROXY_PORT=8474
+      - AUTO_START_SERVER=true
+      - LOG_LEVEL=info
+    volumes:
+      - ./:/usr/src/app
+      - /usr/src/app/node_modules
+    restart: unless-stopped
+    networks:
+      - toxiproxy-network
+
+  # Example services that might use the proxy
+  # Uncomment and customize as needed
+  
+  # redis:
+  #   image: redis:latest
+  #   container_name: redis
+  #   ports:
+  #     - "6379:6379"
+  #   networks:
+  #     - toxiproxy-network
+  
+  # app:
+  #   image: your-app:latest
+  #   depends_on:
+  #     - toxiproxy-wrapper
+  #   environment:
+  #     - REDIS_HOST=toxiproxy-wrapper
+  #     - REDIS_PORT=26379  # Point to the proxied port instead of direct redis
+  #   networks:
+  #     - toxiproxy-network
+
+networks:
+  toxiproxy-network:
+    driver: bridge
