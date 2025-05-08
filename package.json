@@ -5,8 +5,13 @@
   "description": "A hub of ToxiProxy network simulation conditions",
   "main": "src/index.js",
   "scripts": {
+    "start": "node src/index.js",
     "dev": "nodemon --inspect src/index.js",
-    "test": "mocha"
+    "test": "mocha",
+    "build": "node build-sea.js",
+    "build:linux": "node build-sea.js linux",
+    "build:win": "node build-sea.js win32",
+    "build:mac": "node build-sea.js darwin"
   },
   "repository": {
     "type": "git",

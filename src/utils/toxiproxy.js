@@ -60,7 +60,7 @@ export class ToxiProxy extends EventEmitter {
 
     this.#process.stderr.on('data', data => {
       logger.debug(`Toxiproxy server stderr: ${data}`);
-      this.emit('error', data);
+      this.emit('toxi:error', data);
     });
 
     this.#process.on('close', code => {
@@ -87,6 +87,14 @@ export class ToxiProxy extends EventEmitter {
     this.#process = null;
     this.#isRunning = false;
     return true;
+  }
+
+  restart() {
+    logger.info('Toxiproxy server is resetting');
+    this.#isRunning = false;
+    this.#process?.kill();
+    this.#process = null;
+    return this.start();
   }
 
   async sync() {

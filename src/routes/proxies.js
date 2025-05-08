@@ -1,4 +1,5 @@
 import axios from 'axios';
+import logger from '../logger.js';
 import { createProxySchema } from './schemas/proxies.js';
 
 /**
@@ -12,6 +13,7 @@ async function getProxies(req, res) {
     await this.proxy.sync();
     res.json(this.proxy.proxies);
   } catch (error) {
+    logger.error(error.message);
     res.status(500).json({ error: error.message });
   }
 }
@@ -36,8 +38,13 @@ async function createProxy(req, res) {
     await this.proxy.sync();
     res.status(201).json(response.data);
   } catch (error) {
+    logger.error(error.message);
+    if (error.message.includes(this.proxy.options.toxiproxyPort)) {
+      res.status(503).json({ message: 'Toxiproxy is down, trying to restart' });
+      return this.proxy.restart();
+    }
     if (error.response) res.status(error.response.status).json(error.response.data);
-    else res.status(500).json({ error: error.message });
+    else res.status(502).json({ error: error.message });
   }
 }
 
@@ -54,6 +61,7 @@ async function getProxy(req, res) {
     const response = await axios.get(`${this.proxy.hostname}/proxies/${name}`);
     res.json(response.data);
   } catch (error) {
+    logger.error(error.message);
     if (error.response) res.status(error.response.status).json(error.response.data);
     else res.status(500).json({ error: error.message });
   }
@@ -82,6 +90,7 @@ async function toggleProxy(req, res) {
     await this.proxy.sync();
     res.json(updateResponse.data);
   } catch (error) {
+    logger.error(error.message);
     if (error.response) res.status(error.response.status).json(error.response.data);
     else res.status(500).json({ error: error.message });
   }
@@ -101,6 +110,7 @@ async function deleteProxy(req, res) {
     await this.proxy.sync();
     res.status(204).end();
   } catch (error) {
+    logger.error(error.message);
     if (error.response) res.status(error.response.status).json(error.response.data);
     else res.status(500).json({ error: error.message });
   }

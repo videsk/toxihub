@@ -1,5 +1,5 @@
 export default {
-  id: 'toxic',
+  $id: 'toxic',
   type: 'object',
   properties: {
     type: {

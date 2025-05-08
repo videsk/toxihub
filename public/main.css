@@ -1,0 +1,91 @@
+@keyframes glitch {
+    0% { transform: translate(0) }
+    20% { transform: translate(-2px, 2px) }
+    40% { transform: translate(-2px, -2px) }
+    60% { transform: translate(2px, 2px) }
+    80% { transform: translate(2px, -2px) }
+    100% { transform: translate(0) }
+}
+
+.glitch-text:hover {
+    animation: glitch 200ms linear 3;
+    text-shadow: 1px 0 0 #e06c75, -1px 0 0 #56b6c2;
+}
+
+.scanline {
+    background: rgba(122, 239, 164, 0.1);
+    height: 2px;
+    position: absolute;
+    width: 100%;
+    z-index: 999;
+    animation: scanline 6s linear infinite;
+}
+
+@keyframes scanline {
+    0% { top: 0; }
+    100% { top: 100%; }
+}
+
+.crt-effect {
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.02));
+    background-size: 100% 2px, 3px 100%;
+}
+
+.proxy-button {
+    display: inline-block;
+    padding: 2px 6px;
+    border: 1px solid;
+    margin: 2px 0;
+    transition: all 0.2s;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+.enable-btn {
+    border-color: #4af626;
+    color: #4af626;
+    background-color: rgba(74, 246, 38, 0.1);
+}
+
+.enable-btn:hover {
+    background-color: #4af626;
+    color: #0d1117;
+}
+
+.disable-btn {
+    border-color: #e06c75;
+    color: #e06c75;
+    background-color: rgba(224, 108, 117, 0.1);
+}
+
+.disable-btn:hover {
+    background-color: #e06c75;
+    color: #0d1117;
+}
+
+.delete-btn {
+    border-color: #d7ba7d;
+    color: #d7ba7d;
+    background-color: rgba(215, 186, 125, 0.1);
+}
+
+.delete-btn:hover {
+    background-color: #d7ba7d;
+    color: #0d1117;
+}
+
+.toxic-attr-input {
+    width: 100%;
+    background-color: #1f2937;
+    border: 1px solid #26a269;
+    color: #4af626;
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.toxic-attr-input:focus {
+    outline: none;
+    border-color: #4af626;
+}
