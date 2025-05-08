@@ -60,7 +60,7 @@ export class ToxiProxy extends EventEmitter {
 
     this.#process.stderr.on('data', data => {
       logger.debug(`Toxiproxy server stderr: ${data}`);
-      this.emit('error', data);
+      this.emit('toxi:error', data);
     });
 
     this.#process.on('close', code => {
