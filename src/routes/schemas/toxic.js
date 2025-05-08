@@ -16,6 +16,7 @@ export default {
         'corrupt',
         'delay',
         'echo',
+        'reset_peer',
       ],
     },
     name: {
