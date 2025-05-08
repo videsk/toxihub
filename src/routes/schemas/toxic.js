@@ -15,8 +15,7 @@ export default {
         'reset',
         'corrupt',
         'delay',
-        'echo',
-        'reset_peer',
+        'echo'
       ],
     },
     name: {
