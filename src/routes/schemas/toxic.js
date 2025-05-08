@@ -15,7 +15,7 @@ export default {
         'reset',
         'corrupt',
         'delay',
-        'echo',
+        'echo'
       ],
     },
     name: {

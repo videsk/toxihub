@@ -245,9 +245,6 @@ class ToxiproxyClient extends EventTarget {
         timeout: [
             { name: 'timeout', type: 'number', default: 10000, label: 'Timeout (ms)' }
         ],
-        reset_peer: [
-            { name: 'timeout', type: 'number', default: 0, label: 'Timeout (ms)' }
-        ],
         slicer: [
             { name: 'average_size', type: 'number', default: 64, label: 'Average Size (bytes)' },
             { name: 'size_variation', type: 'number', default: 32, label: 'Size Variation (bytes)' },
