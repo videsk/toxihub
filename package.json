@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/videsk/toxihub#readme",
   "dependencies": {
-    "ajv": "^8.17.1",
+    "ajv": "^8.18.0",
     "axios": "^1.9.0",
     "body-parser": "^2.2.0",
     "cors": "^2.8.5",
